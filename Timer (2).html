@@ -1,359 +1,284 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-  <meta charset="UTF-8">
-  <title>PS3 Timer</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bar Daftarchasi</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f3f3f3;
+    margin: 0;
+    padding: 20px;
+  }
+  h1 { text-align: center; color: #333; }
+  .tables {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 15px;
+    margin-bottom: 40px;
+  }
+  .table-box {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    padding: 15px;
+  }
+  .table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .summa { font-weight: bold; color: #27ae60; }
+  .drink {
+    display: flex; align-items: center; justify-content: space-between;
+    margin: 6px 0; background: #f8f8f8; border-radius: 6px; padding: 6px 10px;
+  }
+  .drink button {
+    width: 30px; height: 30px; font-size: 18px; border: none;
+    border-radius: 50%; cursor: pointer; color: white;
+  }
+  .minus { background: #e74c3c; }
+  .plus { background: #27ae60; }
+  .drink span { flex: 1; text-align: center; font-weight: bold; color: #333; }
+  .add-btn {
+    background: #3498db; color: white; border: none; padding: 8px 14px;
+    border-radius: 8px; font-size: 14px; cursor: pointer; width: 100%; margin-top: 10px;
+  }
+  .add-btn:hover { background: #2980b9; }
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      display: block;
-      width: 350px;
-      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-    }
+  /* Hisobot oynasi */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 10;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.6);
+  }
+  .modal-content {
+    background: #fff;
+    margin: 5% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    position: relative;
+  }
+  .close-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    float: right;
+  }
+  .report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  ul { list-style-type: none; padding: 0; }
+  li {
+    background: #f9f9f9;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  li button {
+    float: right;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 3px 8px;
+    cursor: pointer;
+  }
+  .footer {
+    text-align: center;
+    margin-top: 20px;
+  }
+  .footer button {
+    background: #e74c3c; color: white; border: none;
+    padding: 10px 20px; border-radius: 8px; font-size: 16px; cursor: pointer;
+  }
+  .footer button:hover { background: #c0392b; }
 
-    #pasdagi {
-      position: fixed;
-      background: orange;
-      top: 20px;
-      left: 20px;
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 20px;
-      z-index: 10000;
-    }
-
-    /* === HISOBOT TAB === */
-    #logTab {
-      display: none; /* Bosilganda ko‘rsatiladi */
-      position: fixed;
-      width: 350px;
-      inset: 0;
-      background: #f5f7fb;
-      padding: 16px;
-      overflow-y: auto;
-      z-index: 9999;
-      font-family: Arial, sans-serif;
-    }
-
-    #logTab h2 {
-      margin-top: 0;
-      color: #0d47a1;
-      text-align: center;
-    }
-
-    #logTab button {
-      padding: 10px 14px;
-      border: none;
-      border-radius: 8px;
-      margin: 5px 4px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    #logTab button:first-of-type {
-      background: #607d8b;
-      color: #fff;
-    }
-
-    #logTab button:last-of-type {
-      background: #d32f2f;
-      color: #fff;
-    }
-
-    #logList {
-      list-style: none;
-      padding: 0;
-      margin-top: 15px;
-    }
-
-    #logList li {
-      background: #fff;
-      margin-bottom: 10px;
-      padding: 12px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-      font-size: 14px;
-      line-height: 1.4;
-    }
-
-    @media (max-width: 600px) {
-      #logTab {
-        padding: 10px;
-      }
-      #logList li {
-        font-size: 13px;
-      }
-    }
-
-    h1 {
-      text-align: center;
-      color: #0d47a1;
-      font-size: 45px;
-      font-weight: 800;
-      margin: 20px 0;
-    }
-
-    .ps {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    .timer {
-      background: #fff;
-      padding: 15px;
-      width: 260px;
-      border-radius: 16px;
-      box-shadow: 0 8px 20px rgba(13,71,161,0.15);
-      border-top: 6px solid #1976d2;
-    }
-
-    .timer h3 {
-      color: #1565c0;
-      margin-bottom: 10px;
-    }
-
-    .time {
-      font-weight: bold;
-      font-size: 18px;
-      color: #0d47a1;
-    }
-
-    .cost {
-      font-weight: bold;
-      color: #1a237e;
-    }
-
-    button {
-      width: 100%;
-      margin-top: 6px;
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    .tarif-btn {
-      background: #e3f2fd;
-      color: #0d47a1;
-    }
-
-    .tarif-btn.active {
-      background: #1976d2;
-      color: #fff;
-    }
-
-    .start-btn { background: #1976d2; color: #fff; }
-    .stop-btn  { background: #21a7eb; color: #fff; }
-    .reset-btn { background: red; color: #fff; }
-
-    .start-time {
-      margin-top: 8px;
-      font-size: 14px;
-      color: #555;
-    }
-  </style>
+  .show-report-btn {
+    display: block;
+    margin: 0 auto 15px;
+    padding: 10px 20px;
+    background: #2ecc71;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .show-report-btn:hover { background: #27ae60; }
+</style>
 </head>
-
 <body>
+<h1>🍹 Bar Daftarchasi</h1>
 
-<h1>PS 3</h1>
+<button class="show-report-btn" onclick="openReport()">📋 Hisobotni ko‘rish</button>
 
-<!-- HISOBOTLAR TAB -->
-<div id="logTab">
-  <h2>📑 Hisobotlar</h2>
-  <button onclick="closeLogTab()">❌ Yopish</button>
-  <button onclick="clearLogs()" style="background:red;color:white;">🗑 Tozalash</button>
-  <ul id="logList"></ul>
-</div>
+<div class="tables" id="tables"></div>
 
-<!-- PS TIMERLAR -->
-<div class="ps">
-  <!-- 1-Stol -->
-  <div class="timer">
-    <h3>1-Stol</h3>
-    <p>Vaqt: <span class="time">00:00:00:000</span></p>
-    <p>Tarif: <span class="current-tarif">Tanlanmagan</span></p>
-    <p>Summa: <span class="cost">0</span> so'm</p>
-
-    <button class="tarif-btn" onclick="setTarif(this,15000)">2 ta pult</button>
-    <button class="tarif-btn" onclick="setTarif(this,18000)">3 ta pult</button>
-    <button class="tarif-btn" onclick="setTarif(this,20000)">4 ta pult</button>
-
-    <button class="start-btn" onclick="startTimer(this)">Start</button>
-    <button class="stop-btn" onclick="stopTimer(this)">Stop</button>
-    <button class="reset-btn" onclick="resetTimer(this)">Reset</button>
-  </div>
-
-  <!-- 2-Stol -->
-  <div class="timer">
-    <h3>2-Stol</h3>
-    <p>Vaqt: <span class="time">00:00:00:000</span></p>
-    <p>Tarif: <span class="current-tarif">Tanlanmagan</span></p>
-    <p>Summa: <span class="cost">0</span> so'm</p>
-
-    <button class="tarif-btn" onclick="setTarif(this,15000)">2 ta pult</button>
-    <button class="tarif-btn" onclick="setTarif(this,18000)">3 ta pult</button>
-    <button class="tarif-btn" onclick="setTarif(this,20000)">4 ta pult</button>
-
-    <button class="start-btn" onclick="startTimer(this)">Start</button>
-    <button class="stop-btn" onclick="stopTimer(this)">Stop</button>
-    <button class="reset-btn" onclick="resetTimer(this)">Reset</button>
-  </div>
-
-  <!-- 3-Stol -->
-  <div class="timer">
-    <h3>3-Stol</h3>
-    <p>Vaqt: <span class="time">00:00:00:000</span></p>
-    <p>Tarif: <span class="current-tarif">Tanlanmagan</span></p>
-    <p>Summa: <span class="cost">0</span> so'm</p>
-
-    <button class="tarif-btn" onclick="setTarif(this,15000)">2 ta pult</button>
-    <button class="tarif-btn" onclick="setTarif(this,18000)">3 ta pult</button>
-    <button class="tarif-btn" onclick="setTarif(this,20000)">4 ta pult</button>
-
-    <button class="start-btn" onclick="startTimer(this)">Start</button>
-    <button class="stop-btn" onclick="stopTimer(this)">Stop</button>
-    <button class="reset-btn" onclick="resetTimer(this)">Reset</button>
+<div id="reportModal" class="modal">
+  <div class="modal-content">
+    <div class="report-header">
+      <h2>🧾 Hisobot</h2>
+      <button class="close-btn" onclick="closeReport()">Yopish ✖</button>
+    </div>
+    <ul id="reportList"></ul>
+    <div class="footer">
+      <button onclick="clearAll()">♻️ Hammasini o‘chirish</button>
+    </div>
   </div>
 </div>
-
-<!-- OPEN LOG BUTTON -->
-<div id="pasdagi" onclick="openLogTab()">📑</div>
 
 <script>
-/*********************************
- * GLOBAL STORAGE
- *********************************/
-const TIMER_LOG_KEY = "ps_timer_logs";
-const timers = new Map();
+const drinks = [
+  { name: "Cola 0.25L", price: 4000 },
+  { name: "Cola 0.5L", price: 7000 },
+  { name: "Cola 1L", price: 12000 },
+  { name: "Cola 1.5L", price: 15000 },
+  { name: "Cola 2L", price: 20000 },
+  { name: "Fanta 0.25L", price: 4000 },
+  { name: "Fanta 0.5L", price: 7000 },
+  { name: "Fanta 1L", price: 12000 },
+  { name: "Fanta 1.5L", price: 15000 },
+  { name: "Fanta 2L", price: 20000 },
+  { name: "Flavis 0.6L", price: 7000 },
+  { name: "Flavis 1.2L", price: 13000 },
+  { name: "Ark Tea 0.5L", price: 6000 },
+  { name: "Ark Tea 1L", price: 12000 },
+];
 
-/*********************************
- * LOCAL STORAGE
- *********************************/
-function getLogs() {
-  try { return JSON.parse(localStorage.getItem(TIMER_LOG_KEY)) || []; } 
-  catch { return []; }
-}
-function saveLogs(logs) { localStorage.setItem(TIMER_LOG_KEY, JSON.stringify(logs)); }
-function addLog(log) { const logs = getLogs(); logs.push(log); saveLogs(logs); }
+const tables = {};
+let reports = [];
 
-/*********************************
- * HISOBOT TAB
- *********************************/
-function openLogTab() {
-  const tab = document.getElementById("logTab");
-  if (tab) tab.style.display = "block";
-  renderLogs();
-}
-function closeLogTab() { document.getElementById("logTab").style.display = "none"; }
-function clearLogs() {
-  if (!confirm("Barcha hisobotlar o‘chsinmi?")) return;
-  localStorage.removeItem(TIMER_LOG_KEY);
-  renderLogs();
-}
-function renderLogs() {
-  const list = document.getElementById("logList");
-  list.innerHTML = "";
-  getLogs().forEach((log,i)=>{
-    const li = document.createElement("li");
-    li.textContent = `${i+1}) ${log.date} | ${log.duration} | ${log.tarif} | ${log.cost} so'm | ${log.action}`;
-    list.appendChild(li);
-  });
-}
-
-/*********************************
- * TARIF TANLASH
- *********************************/
-function setTarif(btn, rate) {
-  const box = btn.closest(".timer");
-  if(!box) return;
-  box.rate = rate;
-  box.tarifName = btn.innerText;
-  box.querySelector(".current-tarif").innerText = btn.innerText;
-  box.querySelectorAll(".tarif-btn").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
+function createTables() {
+  const container = document.getElementById("tables");
+  for (let i = 1; i <= 8; i++) {
+    tables[i] = {};
+    const div = document.createElement("div");
+    div.className = "table-box";
+    div.innerHTML = `
+      <div class="table-header">
+        <h3>🪑 Stol ${i}</h3>
+        <div class="summa" id="sum${i}">0 so'm</div>
+      </div>
+      ${drinks.map((d, idx) => `
+        <div class="drink">
+          <button class="minus" onclick="updateCount(${i}, ${idx}, -1)">-</button>
+          <span id="t${i}d${idx}">${d.name} (0)</span>
+          <button class="plus" onclick="updateCount(${i}, ${idx}, 1)">+</button>
+        </div>
+      `).join("")}
+      <button class="add-btn" onclick="addToReport(${i})">➕ Qo'shish</button>
+    `;
+    container.appendChild(div);
+  }
 }
 
-/*********************************
- * TIMER
- *********************************/
-function startTimer(btn){
-  const box = btn.closest(".timer");
-  if(!box || !box.rate){ alert("Avval tarif tanlang!"); return; }
-  if(timers.has(box)) return;
-
-  box.startTime = Date.now();
-  box.offset = box.offset || 0;
-
-  const interval = setInterval(()=>{
-    const elapsed = Date.now()-box.startTime + box.offset;
-    updateUI(box, elapsed);
-  },50);
-  timers.set(box, interval);
+function updateCount(table, drinkIdx, delta) {
+  const drink = drinks[drinkIdx];
+  if (!tables[table][drink.name]) tables[table][drink.name] = 0;
+  tables[table][drink.name] = Math.max(0, tables[table][drink.name] + delta);
+  document.getElementById(`t${table}d${drinkIdx}`).textContent =
+    `${drink.name} (${tables[table][drink.name]})`;
+  updateSum(table);
 }
 
-function stopTimer(btn){
-  const box = btn.closest(".timer");
-  if(!box || !timers.has(box)) return;
-  clearInterval(timers.get(box));
-  timers.delete(box);
-  box.offset += Date.now() - box.startTime;
-  box.startTime = null;
-  saveTimerLog(box,"STOP");
+function updateSum(table) {
+  let sum = 0;
+  for (let d in tables[table]) {
+    const qty = tables[table][d];
+    const price = drinks.find(x => x.name === d)?.price || 0;
+    sum += qty * price;
+  }
+  document.getElementById(`sum${table}`).textContent = sum.toLocaleString() + " so'm";
 }
 
-function resetTimer(btn){
-  const box = btn.closest(".timer");
-  if(!box) return;
-  if(timers.has(box)){ clearInterval(timers.get(box)); timers.delete(box); }
-  saveTimerLog(box,"RESET");
-  box.startTime = null;
-  box.offset = 0;
-  box.querySelector(".time").innerText="00:00:00:000";
-  box.querySelector(".cost").innerText="0";
-}
-
-function updateUI(box, elapsed){
-  const h=Math.floor(elapsed/3600000);
-  const m=Math.floor((elapsed%3600000)/60000);
-  const s=Math.floor((elapsed%60000)/1000);
-  const ms=elapsed%1000;
-  box.querySelector(".time").innerText=
-    `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}:${String(ms).padStart(3,"0")}`;
-  const cost = Math.round(elapsed/3600000*(box.rate||0));
-  box.querySelector(".cost").innerText=cost.toLocaleString();
-}
-
-function saveTimerLog(box,action){
+function addToReport(table) {
   const now = new Date();
-  const date =
-    `${String(now.getDate()).padStart(2,"0")}.`+
-    `${String(now.getMonth()+1).padStart(2,"0")}.`+
-    `${now.getFullYear()} ${now.toLocaleTimeString()}`;
-  const totalMs = box.offset || 0;
-  const h=Math.floor(totalMs/3600000);
-  const m=Math.floor((totalMs%3600000)/60000);
-  const s=Math.floor((totalMs%60000)/1000);
-  const ms = totalMs%1000;
-  const cost = Math.round(totalMs/3600000*(box.rate||0));
-  addLog({
+  const date = `${now.getDate()}.${now.getMonth()+1}.${now.getFullYear()} ${now.toLocaleTimeString()}`;
+  let total = 0;
+  const items = [];
+
+  for (let d in tables[table]) {
+    const qty = tables[table][d];
+    if (qty > 0) {
+      const price = drinks.find(x => x.name === d).price;
+      total += qty * price;
+      items.push(`${qty}x ${d}`);
+    }
+  }
+
+  if (items.length === 0) return alert("Hech narsa tanlanmagan!");
+
+  reports.push({
+    id: Date.now(),
+    table,
     date,
-    duration:`${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}:${String(ms).padStart(3,"0")}`,
-    tarif:box.tarifName||"Tarif tanlanmagan",
-    cost:cost.toLocaleString(),
-    action
+    total,
+    items
   });
+
+  tables[table] = {};
+  const tableBox = document.querySelectorAll(".table-box")[table - 1];
+  const spans = tableBox.querySelectorAll("span[id^='t" + table + "']");
+  spans.forEach((span, idx) => span.textContent = `${drinks[idx].name} (0)`);
+  updateSum(table);
 }
+
+function openReport() {
+  const modal = document.getElementById("reportModal");
+  const list = document.getElementById("reportList");
+  if (reports.length === 0) list.innerHTML = "<li>Hozircha hisobot yo‘q.</li>";
+  else {
+    list.innerHTML = reports.map(r => `
+      <li>
+        <b>🪑 ${r.table}-stol</b><br>
+        ${r.date}<br>
+        Narx: <b>${r.total.toLocaleString()} so'm</b><br>
+        Ichimliklar:<br>
+        ${r.items.map(i => "• " + i).join("<br>")}
+        <button onclick="deleteReport(${r.id})">O‘chirish</button>
+      </li>
+    `).join("");
+  }
+  modal.style.display = "block";
+}
+
+function closeReport() {
+  document.getElementById("reportModal").style.display = "none";
+}
+
+function deleteReport(id) {
+  reports = reports.filter(r => r.id !== id);
+  openReport();
+}
+
+function clearAll() {
+  if (confirm("Barcha hisobotlarni o‘chirishni xohlaysizmi?")) {
+    reports = [];
+    openReport();
+  }
+}
+
+window.onclick = function(event) {
+  const modal = document.getElementById("reportModal");
+  if (event.target == modal) modal.style.display = "none";
+};
+
+createTables();
 </script>
 </body>
 </html>
